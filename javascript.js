@@ -1,53 +1,81 @@
 // gameboard
 const gameboard = (function () {
+	// probably set default values of the gameboard's cells to 0
+	// and then check if the value is "empty" by checking if the value at the given cell is equal to 0.
+	// Also, should the gameboard array be 2d?
 	let gameboard = ["X", "X", "O", "O", "X", "O", "X", "O", "O"];
 
 	let updateGameboard = function (cell, value) {
 		gameboard[cell - 1] = value;
 	};
 
-	return { gameboard, updateGameboard };
+	const getGameboard = () => gameboard;
+
+	return { getGameboard, updateGameboard };
 })();
 
 // player X with name and mark
-function createPlayerX(name) {
+function createPlayerX() {
 	const mark = "X";
 
-	return { name, mark };
+	const name = prompt('Player 1\'s name. Will have mark "X" ');
+
+	const getName = () => name;
+
+	const getMark = () => mark;
+
+	return { getName, getMark };
 }
 
 // player O with name and mark
-function createPlayerO(name) {
+function createPlayerO() {
 	const mark = "O";
 
-	return { name, mark };
+	const name = prompt('Player 2\'s name. Will have mark "O" ');
+
+	const getName = () => name;
+
+	const getMark = () => mark;
+
+	return { getName, getMark };
 }
 
 // game flow control
-function gameUpdater() {
+function gameController() {
+	// create board
+	const board = gameboard();
+
+	// create players
+	const playerX = createPlayerX();
+	const playerO = createPlayerO();
+
 	// max 9 turns
 	let turnCounter = 0;
-	let playerTurn = "X";
 
-	let updatePlayerTurn = function () {
-		if (playerTurn == "X") {
-			playerTurn = "O";
-		} else if (playerTurn == "X") {
-			playerTurn = "X";
-		}
-
-		turnCounter++;
-	};
+	// player with mark X starts
+	let playerTurn = playerX;
 
 	let getTurnCount = function () {
 		return turnCounter;
 	};
 
-	return { playerTurn, updatePlayerTurn, getTurnCount };
-}
+	let updatePlayerTurn = function () {
+		if (playerTurn == playerX) {
+			playerTurn = playerO;
+		} else if (playerTurn == playerO) {
+			playerTurn = playerX;
+		}
 
-// // make move
-// function maveMove() {}
+		turnCounter++;
+	};
+
+	const playRound = function (cell, mark) {
+		board.updateGameboard(cell, mark);
+		updatePlayerTurn();
+	};
+
+	return { playerTurn, getTurnCount, playRound };
+}
 
 // check game winner
 function checkWinner(gameboard) {
