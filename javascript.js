@@ -11,13 +11,13 @@ const gameboard = (function () {
 		}
 	}
 
-	let updateGameboard = function (cell, value) {
-		gameboard[cell - 1] = value;
+	let placeMark = function (row, column, mark) {
+		gameboard[row][column] = mark;
 	};
 
 	const getGameboard = () => gameboard;
 
-	return { getGameboard, updateGameboard };
+	return { getGameboard, placeMark };
 })();
 
 // player X with name and mark
@@ -49,7 +49,7 @@ function createPlayerO() {
 // game flow control
 function gameController() {
 	// create board
-	const board = gameboard();
+	//const board = gameboard();
 
 	// create players
 	const playerX = createPlayerX();
@@ -61,9 +61,11 @@ function gameController() {
 	// player with mark X starts
 	let playerTurn = playerX;
 
-	let getTurnCount = function () {
+	const getTurnCount = function () {
 		return turnCounter;
 	};
+
+	const getPlayerTurn = () => playerTurn;
 
 	let updatePlayerTurn = function () {
 		if (playerTurn == playerX) {
@@ -75,13 +77,58 @@ function gameController() {
 		turnCounter++;
 	};
 
-	const playRound = function (cell, mark) {
-		board.updateGameboard(cell, mark);
-		updatePlayerTurn();
+	// get next round
+	const nextRound = function () {
+		console.log(turnCounter);
+		// print gameboard in console
+		console.table(gameboard.getGameboard());
+
+		if (turnCounter == 0) {
+			console.log(`${getPlayerTurn().getName()} starts!`);
+		} else if (turnCounter < 9) {
+			console.log(`${getPlayerTurn().getName()}'s turn!`);
+			playRound();
+		} else {
+			return;
+		}
 	};
 
-	return { playerTurn, getTurnCount, playRound };
+	// prompt player for move
+	const getPlayerMove = function () {
+		// TODO: Prevent users from passing in wrong inputs
+		// TODO: Prevent users from overriding cells that are not empty - check for valid cell
+		const getMarkPlacement = prompt("Choose the row and column position. Use commas to seperate! - Example: 2,1");
+		// TODO: Is it possible to use multiple seperators? Like commas, dots, hyphens etc.?
+		const getMarkPlacementArray = getMarkPlacement.split(",");
+		return getMarkPlacementArray;
+	};
+
+	const playRound = function () {
+		const playerMove = getPlayerMove();
+		const row = parseInt(playerMove[0]);
+		const column = parseInt(playerMove[1]);
+
+		// place mark
+		gameboard.placeMark(row, column, playerTurn.getMark());
+
+		// update player turn to next player
+		updatePlayerTurn();
+
+		// print board after a player move
+		nextRound();
+	};
+
+	nextRound();
+
+	return { getPlayerTurn, getTurnCount, playRound };
 }
+
+const startGame = function () {
+	const game = gameController();
+	game.playRound();
+};
+
+startGame();
 
 // check game winner
 function checkWinner(gameboard) {
