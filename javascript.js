@@ -1,9 +1,15 @@
-// gameboard
 const gameboard = (function () {
-	// probably set default values of the gameboard's cells to 0
-	// and then check if the value is "empty" by checking if the value at the given cell is equal to 0.
-	// Also, should the gameboard array be 2d?
-	let gameboard = ["X", "X", "O", "O", "X", "O", "X", "O", "O"];
+	// create 2d array gameboard. Set default values to 0 (meaning empty).
+	const rows = 3;
+	const columns = 3;
+	let gameboard = [];
+
+	for (let i = 0; i < rows; i++) {
+		gameboard[i] = [];
+		for (let j = 0; j < columns; j++) {
+			gameboard[i][j] = 0;
+		}
+	}
 
 	let updateGameboard = function (cell, value) {
 		gameboard[cell - 1] = value;
