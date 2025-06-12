@@ -15,9 +15,13 @@ const gameboard = (function () {
 		board[row][column] = mark;
 	};
 
+	let getCellValue = function (row, column) {
+		return board[row][column];
+	};
+
 	const getGameboard = () => board;
 
-	return { getGameboard, placeMark };
+	return { getGameboard, placeMark, getCellValue };
 })();
 
 // player X with name and mark
@@ -138,11 +142,22 @@ function gameController() {
 	};
 
 	const playRound = function () {
-		const playerMove = getPlayerMove();
-		const row = parseInt(playerMove[0]);
-		const column = parseInt(playerMove[1]);
+		let validCell = false;
+		let row;
+		let column;
 
-		// place mark
+		// prompt user for a move until a valid cell is chosen
+		while (!validCell) {
+			const playerMove = getPlayerMove();
+			row = parseInt(playerMove[0]);
+			column = parseInt(playerMove[1]);
+
+			if (checkPlayerMoveValidity(row, column)) {
+				validCell = true;
+			}
+		}
+
+		// place mark after securing valid cell
 		gameboard.placeMark(row, column, playerTurn.getMark());
 
 		// update player turn to next player
@@ -156,6 +171,25 @@ function gameController() {
 
 	return { getPlayerTurn, getTurnCount, playRound };
 }
+
+const checkPlayerMoveValidity = function (row, column) {
+	let validMove = false;
+	if (
+		!isNaN(row) &&
+		!isNaN(column) &&
+		row >= 0 &&
+		row < 3 &&
+		column >= 0 &&
+		column < 3 &&
+		gameboard.getCellValue(row, column) == 0
+	) {
+		validMove = true;
+	} else {
+		console.log("Invalid input or cell already taken. Try again.");
+	}
+
+	return validMove;
+};
 
 const startGame = function () {
 	const game = gameController();
