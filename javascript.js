@@ -52,9 +52,6 @@ function createPlayerO() {
 
 // game flow control
 function gameController() {
-	// create board
-	//const board = gameboard();
-
 	// create players
 	const playerX = createPlayerX();
 	const playerO = createPlayerO();
@@ -102,18 +99,13 @@ function gameController() {
 			console.log(`${getPlayerTurn().getName()} starts!`);
 		} else if (turnCounter < 9) {
 			console.log(`${getPlayerTurn().getName()}'s turn!`);
-			//playRound();
 		}
 
 		if (turnCounter > 4) {
-			console.log("test turncounter > 4");
-
 			const checkWinnerResult = checkWinner(gameboard);
 
 			winnerFound = checkWinnerResult.getWinningConditionMet();
 			if (winnerFound == true) {
-				console.log("if winnerfound");
-
 				let winningMark = checkWinnerResult.getWinningMark();
 				if (winningMark == playerX.getMark()) {
 					console.log(`${playerX.getName()} with the ${winningMark} mark has won!`);
@@ -196,58 +188,47 @@ const checkPlayerMoveValidity = function (row, column) {
 
 const startGame = function () {
 	const game = gameController();
-	// game.playRound();
 };
 
 startGame();
 
 // check game winner
 function checkWinner(gameboard) {
-	// TODO: How to check for all winning 3-in-a-rows? Also account for ties.
-
-	console.log("inside checkWinner");
-
 	let winningConditionMet = false;
 	let winnerMark = 0;
-	// let winningLine = false;
-	/* trying firstly by hardcoding the cases */
 
 	// helper function to pass in 3 values
 	function checkThe3Values(a, b, c) {
-		console.log("inside checkThe3Values");
-
 		if (a !== 0 && a == b && b == c) {
-			console.log("inside if of checkthe3vaues");
-
 			winningConditionMet = true;
 			winnerMark = a;
 			return winningConditionMet;
 		} else return false;
 	}
 
-	/*
-	let row0 = checkThe3Values(gameboard[0][0], gameboard[0][1], gameboard[0][2]);
-	let row1 = checkThe3Values(gameboard[1][0], gameboard[1][1], gameboard[1][2]);
-	let row3 = checkThe3Values(gameboard[2][0], gameboard[2][1], gameboard[2][2]);
-
-	let column1 = checkThe3Values(gameboard[0][0], gameboard[1][0], gameboard[2][0]);
-	let column2 = checkThe3Values(gameboard[0][1], gameboard[1][1], gameboard[2][1]);
-	let column3 = checkThe3Values(gameboard[0][2], gameboard[1][2], gameboard[2][2]);
-
-	let leftRightDiagonal = checkThe3Values(gameboard[0][0], gameboard[1][1], gameboard[2][2]);
-	let rightLeftDiagonal = checkThe3Values(gameboard[0][2], gameboard[1][1], gameboard[2][0]);
-	*/
 	let board = gameboard.getGameboard();
-	checkThe3Values(board[0][0], board[0][1], board[0][2]);
-	checkThe3Values(board[1][0], board[1][1], board[1][2]);
-	checkThe3Values(board[2][0], board[2][1], board[2][2]);
 
-	checkThe3Values(board[0][0], board[1][0], board[2][0]);
-	checkThe3Values(board[0][1], board[1][1], board[2][1]);
-	checkThe3Values(board[0][2], board[1][2], board[2][2]);
+	const winningLines = [
+		// rows
+		[board[0][0], board[0][1], board[0][2]],
+		[board[1][0], board[1][1], board[1][2]],
+		[board[2][0], board[2][1], board[2][2]],
+		// columns
+		[board[0][0], board[1][0], board[2][0]],
+		[board[0][1], board[1][1], board[2][1]],
+		[board[0][2], board[1][2], board[2][2]],
+		// diagonals
+		[board[0][0], board[1][1], board[2][2]],
+		[board[0][2], board[1][1], board[2][0]],
+	];
 
-	checkThe3Values(board[0][0], board[1][1], board[2][2]);
-	checkThe3Values(board[0][2], board[1][1], board[2][0]);
+	// loop through each winning possibility
+	for (const line of winningLines) {
+		const [a, b, c] = line;
+		if (checkThe3Values(a, b, c) == true) {
+			break; // stop (short circuit) loop if any winning lines has been found
+		}
+	}
 
 	const getWinningMark = () => winnerMark;
 
