@@ -65,6 +65,8 @@ function gameController() {
 	// player with mark X starts
 	let playerTurn = playerX;
 
+	let winnerFound = false;
+
 	const getTurnCount = function () {
 		return turnCounter;
 	};
@@ -91,12 +93,6 @@ function gameController() {
 		console.table(gameboard.getGameboard());
 
 		console.log("turnCounter = " + turnCounter);
-
-		let winnerFound = false;
-
-		if (turnCounter > 8) {
-			return;
-		}
 
 		if (winnerFound == true) {
 			return;
@@ -126,6 +122,11 @@ function gameController() {
 				}
 				return;
 			}
+		}
+
+		if (turnCounter > 8 && winnerFound == false) {
+			console.log("No winners. It's a tie!");
+			return;
 		}
 
 		playRound();
