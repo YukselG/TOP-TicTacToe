@@ -133,11 +133,13 @@ function gameController() {
 
 	// prompt player for move
 	const getPlayerMove = function () {
-		// TODO: Prevent users from passing in wrong inputs
-		// TODO: Prevent users from overriding cells that are not empty - check for valid cell
 		const getMarkPlacement = prompt("Choose the row and column position. Use commas to seperate! - Example: 2,1");
-		// TODO: Is it possible to use multiple seperators? Like commas, dots, hyphens etc.?
-		const getMarkPlacementArray = getMarkPlacement.split(",");
+		// remove all spaces and replace seperator with a comma using regex
+		const cleanedMarkPlacement = getMarkPlacement
+			.trim()
+			.replace(/\s+/g, "")
+			.replace(/[-.:;_]/g, ",");
+		const getMarkPlacementArray = cleanedMarkPlacement.split(",");
 		return getMarkPlacementArray;
 	};
 
