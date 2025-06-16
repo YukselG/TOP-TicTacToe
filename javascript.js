@@ -80,6 +80,18 @@ function gameController() {
 		turnCounter++;
 	};
 
+	// prompt player for move and trim input
+	const getPlayerMove = function () {
+		const getMarkPlacement = prompt("Choose the row and column position. Use commas to seperate! - Example: 2,1");
+		// remove all spaces and replace seperator with a comma using regex
+		const cleanedMarkPlacement = getMarkPlacement
+			.trim()
+			.replace(/\s+/g, "")
+			.replace(/[-.:;_]/g, ",");
+		const getMarkPlacementArray = cleanedMarkPlacement.split(",");
+		return getMarkPlacementArray;
+	};
+
 	// get next round
 	const nextRound = function () {
 		// print gameboard in console
@@ -91,16 +103,15 @@ function gameController() {
 
 		console.log("turnCounter = " + turnCounter);
 
-		if (winnerFound == true) {
-			return;
-		}
-
 		if (turnCounter == 0) {
 			console.log(`${getPlayerTurn().getName()} starts!`);
 		} else if (turnCounter < 9) {
 			console.log(`${getPlayerTurn().getName()}'s turn!`);
 		}
 
+		playRound();
+
+		// check for winner after 5 plays
 		if (turnCounter > 4) {
 			const checkWinnerResult = checkWinner(gameboard);
 
@@ -112,28 +123,17 @@ function gameController() {
 				} else if (winningMark == playerO.getMark()) {
 					console.log(`${playerO.getName()} with the ${winningMark} mark has won!`);
 				}
-				return;
+				return true; // return true -> game is done (winner found)
 			}
 		}
 
+		// check for tie
 		if (turnCounter > 8 && winnerFound == false) {
 			console.log("No winners. It's a tie!");
-			return;
+			return true; // return true -> game is done (it's a tie)
 		}
 
-		playRound();
-	};
-
-	// prompt player for move
-	const getPlayerMove = function () {
-		const getMarkPlacement = prompt("Choose the row and column position. Use commas to seperate! - Example: 2,1");
-		// remove all spaces and replace seperator with a comma using regex
-		const cleanedMarkPlacement = getMarkPlacement
-			.trim()
-			.replace(/\s+/g, "")
-			.replace(/[-.:;_]/g, ",");
-		const getMarkPlacementArray = cleanedMarkPlacement.split(",");
-		return getMarkPlacementArray;
+		return false; // return false -> game continues
 	};
 
 	const playRound = function () {
@@ -158,11 +158,22 @@ function gameController() {
 		// update player turn to next player
 		updatePlayerTurn();
 
+		return;
 		// print board after a player move
-		nextRound();
+		//nextRound();
 	};
 
-	nextRound();
+	// game loop
+	let gameOver = false;
+	// run while game is not over
+	while (!gameOver) {
+		gameOver = nextRound();
+		// print final state when game is done (winner found or after last turn)
+		if (gameOver) {
+			console.log("Final board state:");
+			console.table(gameboard.getGameboard());
+		}
+	}
 
 	return { getPlayerTurn, getTurnCount, playRound };
 }
@@ -185,12 +196,6 @@ const checkPlayerMoveValidity = function (row, column) {
 
 	return validMove;
 };
-
-const startGame = function () {
-	const game = gameController();
-};
-
-startGame();
 
 // check game winner
 function checkWinner(gameboard) {
@@ -236,3 +241,9 @@ function checkWinner(gameboard) {
 
 	return { getWinningMark, getWinningConditionMet };
 }
+
+const startGame = function () {
+	const game = gameController();
+};
+
+startGame();
