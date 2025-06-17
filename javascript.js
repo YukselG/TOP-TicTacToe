@@ -246,4 +246,4 @@ const startGame = function () {
 	const game = gameController();
 };
 
-startGame();
+// startGame();

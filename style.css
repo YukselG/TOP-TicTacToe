@@ -1,0 +1,74 @@
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html,
+body {
+	height: 100%;
+}
+
+.container {
+	height: 100%;
+	background-color: rosybrown;
+	font-size: 2rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	text-align: center;
+}
+
+header {
+	margin: 40px;
+}
+
+.content {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	flex: 100%;
+}
+
+footer {
+	margin-top: 5px;
+	padding: 40px 0;
+	background-color: aliceblue;
+}
+
+aside {
+	flex: 20%;
+}
+
+main {
+	display: flex;
+	flex-direction: column;
+	background-color: antiquewhite;
+	padding: 10px;
+	gap: 30px;
+	flex: 60%;
+}
+
+.game-updates {
+	background-color: #fff;
+	flex: 10%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.cell-container {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: repeat(3, 1fr);
+	background-color: aquamarine;
+	flex: 90%;
+}
+
+.cell {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border: thin solid green;
+	background-color: burlywood;
+}
