@@ -25,10 +25,11 @@ const gameboard = (function () {
 })();
 
 // player X with name and mark
-function createPlayerX() {
+function createPlayerX(name) {
 	const mark = "X";
 
-	const name = prompt('Player 1\'s name. Will have mark "X" ');
+	// for console
+	// const name = prompt('Player 1\'s name. Will have mark "X" ');
 
 	const getName = () => name;
 
@@ -38,10 +39,11 @@ function createPlayerX() {
 }
 
 // player O with name and mark
-function createPlayerO() {
+function createPlayerO(name) {
 	const mark = "O";
 
-	const name = prompt('Player 2\'s name. Will have mark "O" ');
+	// for console
+	// const name = prompt('Player 2\'s name. Will have mark "O" ');
 
 	const getName = () => name;
 
@@ -51,10 +53,10 @@ function createPlayerO() {
 }
 
 // game flow control
-function gameController() {
+function gameController(player1Name, player2Name) {
 	// create players
-	const playerX = createPlayerX();
-	const playerO = createPlayerO();
+	const playerX = createPlayerX(player1Name);
+	const playerO = createPlayerO(player2Name);
 
 	// max 9 turns
 	let turnCounter = 0;
@@ -247,3 +249,30 @@ const startGame = function () {
 };
 
 // startGame();
+/* ---------------------------------------------------------- UI ---------------------------------------------------------- */
+// UI elements
+const gameboardElement = document.querySelector(".gameboard");
+const gameUpdates = document.querySelector(".game-updates");
+const startGameButton = document.querySelector("#start-game");
+
+// variables and objects
+let player1Name = "";
+let player2Name = "";
+
+// get names from inputs
+document.querySelector("#player1").addEventListener("input", (event) => {
+	player1Name = event.target.value;
+});
+document.querySelector("#player2").addEventListener("input", (event) => {
+	player2Name = event.target.value;
+});
+
+// start game
+startGameButton.addEventListener("click", () => {
+	// checcking for truthiness of player name variables. If empty string, it's falsy
+	if (player1Name && player2Name) {
+		gameController(player1Name, player2Name);
+	} else {
+		alert("Enter both player names!");
+	}
+});

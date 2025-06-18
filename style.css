@@ -19,8 +19,31 @@ body {
 	text-align: center;
 }
 
+.row {
+	display: flex;
+	flex-direction: row;
+}
+
+.column {
+	display: flex;
+	flex-direction: column;
+}
+
 header {
-	margin: 40px;
+	margin: 10px;
+}
+
+.start-game-container {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	margin: 10px;
+}
+
+button {
+	padding: 10px;
+	text-align: center;
 }
 
 .content {
@@ -49,7 +72,7 @@ main {
 	flex: 60%;
 }
 
-.game-updates {
+.game-updates-container {
 	background-color: #fff;
 	flex: 10%;
 	display: flex;
@@ -57,7 +80,7 @@ main {
 	align-items: center;
 }
 
-.cell-container {
+.gameboard {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
 	grid-template-rows: repeat(3, 1fr);
@@ -71,4 +94,13 @@ main {
 	align-items: center;
 	border: thin solid green;
 	background-color: burlywood;
+}
+
+.player-container {
+	gap: 10px;
+}
+
+.player-container > input {
+	font-size: 2rem;
+	margin: 0 20px;
 }

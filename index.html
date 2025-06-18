@@ -9,12 +9,24 @@
 	</head>
 	<body>
 		<div class="container">
-			<header>Tic Tac Toe</header>
+			<header>
+				<h2>Tic Tac Toe</h2>
+			</header>
+			<div class="start-game-container">
+				<button id="start-game" type="button">Start game</button>
+			</div>
 			<div class="content">
-				<aside>Player 1</aside>
+				<aside id="player1">
+					<div class="column player-container">
+						<label for="player1-name">Enter Player 1's name:</label>
+						<input type="text" name="player1-name" id="player1-name" size="2" />
+					</div>
+				</aside>
 				<main>
-					<div class="game-updates">Player 1 starts!</div>
-					<div class="cell-container">
+					<div class="game-updates-container">
+						<p class="game-updates">Player 1 starts</p>
+					</div>
+					<div class="gameboard">
 						<div id="cell0" class="cell">0</div>
 						<div id="cell1" class="cell">1</div>
 						<div id="cell2" class="cell">2</div>
@@ -26,7 +38,12 @@
 						<div id="cell8" class="cell">8</div>
 					</div>
 				</main>
-				<aside>Player 2</aside>
+				<aside id="player2">
+					<div class="column player-container">
+						<label for="player2-name">Enter Player 2's name:</label>
+						<input type="text" name="player2-name" id="player2-name" />
+					</div>
+				</aside>
 			</div>
 			<footer>&copy; 2025 YukselG. All rights reserved.</footer>
 		</div>
