@@ -92,7 +92,7 @@ main {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	border: thin solid green;
+	margin: 5px;
 	background-color: burlywood;
 }
 

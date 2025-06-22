@@ -82,16 +82,19 @@ function gameController(player1Name, player2Name) {
 		turnCounter++;
 	};
 
-	// prompt player for move and trim input
-	const getPlayerMove = function () {
-		const getMarkPlacement = prompt("Choose the row and column position. Use commas to seperate! - Example: 2,1");
+	// get player move
+	const getPlayerMove = function (mark) {
+		/* below is for the console*/
+		// const getMarkPlacement = prompt("Choose the row and column position. Use commas to seperate! - Example: 2,1");
 		// remove all spaces and replace seperator with a comma using regex
-		const cleanedMarkPlacement = getMarkPlacement
-			.trim()
-			.replace(/\s+/g, "")
-			.replace(/[-.:;_]/g, ",");
-		const getMarkPlacementArray = cleanedMarkPlacement.split(",");
-		return getMarkPlacementArray;
+		// const cleanedMarkPlacement = getMarkPlacement
+		// 	.trim()
+		// 	.replace(/\s+/g, "")
+		// 	.replace(/[-.:;_]/g, ",");
+		// const getMarkPlacementArray = cleanedMarkPlacement.split(",");
+		// return getMarkPlacementArray;
+		//
+		/* below is for the UI */
 	};
 
 	// get next round
@@ -103,11 +106,17 @@ function gameController(player1Name, player2Name) {
 
 		console.table(gameboard.getGameboard());
 
+		// render board
+		renderGameboard();
+
 		console.log("turnCounter = " + turnCounter);
 
 		if (turnCounter == 0) {
+			// update player turn information
+			gameUpdatesParagraph.textContent = `${getPlayerTurn().getName()} starts!`;
 			console.log(`${getPlayerTurn().getName()} starts!`);
 		} else if (turnCounter < 9) {
+			gameUpdatesParagraph.textContent = `${getPlayerTurn().getName()} it's your turn!`;
 			console.log(`${getPlayerTurn().getName()}'s turn!`);
 		}
 
@@ -252,27 +261,57 @@ const startGame = function () {
 /* ---------------------------------------------------------- UI ---------------------------------------------------------- */
 // UI elements
 const gameboardElement = document.querySelector(".gameboard");
-const gameUpdates = document.querySelector(".game-updates");
+const gameboardCells = gameboardElement.querySelectorAll(".cell");
+const gameUpdatesParagraph = document.querySelector(".game-updates");
 const startGameButton = document.querySelector("#start-game");
 
 // variables and objects
-let player1Name = "";
-let player2Name = "";
+let gameUpdates = "";
+let gameStarted = false;
+// let player1Name = "";
+// let player2Name = "";
 
 // get names from inputs
-document.querySelector("#player1").addEventListener("input", (event) => {
-	player1Name = event.target.value;
-});
-document.querySelector("#player2").addEventListener("input", (event) => {
-	player2Name = event.target.value;
-});
+// document.querySelector("#player1").addEventListener("input", (event) => {x
+// 	player1Name = event.target.value;
+// });
+// document.querySelector("#player2").addEventListener("input", (event) => {
+// 	player2Name = event.target.value;
+// });
 
 // start game
 startGameButton.addEventListener("click", () => {
-	// checcking for truthiness of player name variables. If empty string, it's falsy
+	// get names from input here, so we dont have to use global variables for the names (like above)
+	const player1Name = document.querySelector("#player1-name").value;
+	const player2Name = document.querySelector("#player2-name").value;
+
+	// checking for truthiness of player name variables
 	if (player1Name && player2Name) {
-		gameController(player1Name, player2Name);
+		gameStarted = true;
+		const game = gameController(player1Name, player2Name);
 	} else {
 		alert("Enter both player names!");
 	}
 });
+
+// TODO: update gameboard when player clicks a cell to place a mark
+gameboardElement.addEventListener("click", (event) => {
+	console.log(event);
+});
+
+// TODO: Render board to the UI
+function renderGameboard() {
+	// get board
+	const gameboardState = gameboard.getGameboard();
+	// flatten board to 1d array to iterate more easily
+	const gameboardStateFlatten = gameboardState.flat();
+	let index = 0;
+
+	if (gameStarted == false) {
+		gameboardCells.forEach((cell) => {
+			// assign each cell value to each cell ui
+			cell.textContent = gameboardStateFlatten[index];
+			index++;
+		});
+	}
+}
