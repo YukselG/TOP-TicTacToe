@@ -12,6 +12,9 @@ const gameboard = (function () {
 	}
 
 	let placeMark = function (row, column, mark) {
+		console.log(row);
+		console.log(column);
+
 		board[row][column] = mark;
 	};
 
@@ -53,37 +56,53 @@ function createPlayerO(name) {
 }
 
 // game flow control
-function gameController(player1Name, player2Name) {
-	// create players
-	const playerX = createPlayerX(player1Name);
-	const playerO = createPlayerO(player2Name);
+function gameController() {
+	let playerX;
+	let playerO;
+	let playerTurn;
 
 	// max 9 turns
 	let turnCounter = 0;
 
-	// player with mark X starts
-	let playerTurn = playerX;
-
 	let winnerFound = false;
+
+	const getPlayerTurn = () => playerTurn;
 
 	const getTurnCount = function () {
 		return turnCounter;
 	};
 
-	const getPlayerTurn = () => playerTurn;
-
 	let updatePlayerTurn = function () {
+		console.log("playerTurn = " + getPlayerTurn().getName());
+
 		if (playerTurn == playerX) {
+			console.log("if of update");
+
 			playerTurn = playerO;
+			console.log("after update player turn " + getPlayerTurn().getName());
 		} else if (playerTurn == playerO) {
 			playerTurn = playerX;
+			console.log("after update player turn " + getPlayerTurn().getName());
 		}
 
 		turnCounter++;
 	};
 
+	// create players
+	const setPlayerNames = function (name1, name2) {
+		playerX = createPlayerX(name1);
+		playerO = createPlayerO(name2);
+
+		// and set player x as starter
+		playerTurn = playerX;
+		console.log(playerTurn);
+
+		console.log("playerx name = " + playerX.getName());
+		console.log("playerO name = " + playerO.getName());
+	};
+
 	// get player move
-	const getPlayerMove = function (mark) {
+	const getPlayerMove = function (move) {
 		/* below is for the console*/
 		// const getMarkPlacement = prompt("Choose the row and column position. Use commas to seperate! - Example: 2,1");
 		// remove all spaces and replace seperator with a comma using regex
@@ -95,6 +114,20 @@ function gameController(player1Name, player2Name) {
 		// return getMarkPlacementArray;
 		//
 		/* below is for the UI */
+		// parse input string to int
+		let cell = parseInt(move);
+		// get the row of the cell: divide by 3 and take the floor
+		let row = Math.floor(cell / 3);
+		// get the col of the cell: cell mod 3
+		let col = cell % 3;
+		console.log("row = " + row);
+		console.log("col = " + col);
+
+		// check for valid cell
+		let validCell = checkPlayerMoveValidity(row, col);
+		console.log("validcell = " + validCell);
+
+		return { row, col, validCell };
 	};
 
 	// get next round
@@ -120,7 +153,7 @@ function gameController(player1Name, player2Name) {
 			console.log(`${getPlayerTurn().getName()}'s turn!`);
 		}
 
-		playRound();
+		//playRound();
 
 		// check for winner after 5 plays
 		if (turnCounter > 4) {
@@ -147,46 +180,51 @@ function gameController(player1Name, player2Name) {
 		return false; // return false -> game continues
 	};
 
-	const playRound = function () {
-		let validCell = false;
+	const playRound = function (move) {
+		// let validCell = false;
 		let row;
-		let column;
+		let col;
+		// if (validCell == false) {
+		// 	const playerMove = getPlayerMove(move);
 
-		// prompt user for a move until a valid cell is chosen
-		while (!validCell) {
-			const playerMove = getPlayerMove();
-			row = parseInt(playerMove[0]);
-			column = parseInt(playerMove[1]);
-
-			if (checkPlayerMoveValidity(row, column)) {
-				validCell = true;
-			}
+		// 	if (playerMove == true) {
+		// 		validCell = true;
+		// 	}
+		// }
+		let playerMove = getPlayerMove(move);
+		let validCell = playerMove.validCell;
+		if (validCell == false) {
+			return;
+		} else {
+			row = playerMove.row;
+			col = playerMove.col;
 		}
 
 		// place mark after securing valid cell
-		gameboard.placeMark(row, column, playerTurn.getMark());
+		gameboard.placeMark(row, col, getPlayerTurn().getMark());
+		console.table(gameboard.getGameboard());
 
 		// update player turn to next player
 		updatePlayerTurn();
 
 		return;
 		// print board after a player move
-		//nextRound();
+		nextRound();
 	};
 
 	// game loop
 	let gameOver = false;
-	// run while game is not over
-	while (!gameOver) {
-		gameOver = nextRound();
-		// print final state when game is done (winner found or after last turn)
-		if (gameOver) {
-			console.log("Final board state:");
-			console.table(gameboard.getGameboard());
-		}
-	}
+	// run while game is not over - for console
+	// while (!gameOver) {
+	// 	gameOver = nextRound();
+	// 	// print final state when game is done (winner found or after last turn)
+	// 	if (gameOver) {
+	// 		console.log("Final board state:");
+	// 		console.table(gameboard.getGameboard());
+	// 	}
+	// }
 
-	return { getPlayerTurn, getTurnCount, playRound };
+	return { getPlayerTurn, getTurnCount, playRound, setPlayerNames };
 }
 
 const checkPlayerMoveValidity = function (row, column) {
@@ -203,6 +241,7 @@ const checkPlayerMoveValidity = function (row, column) {
 		validMove = true;
 	} else {
 		console.log("Invalid input or cell already taken. Try again.");
+		gameUpdatesParagraph.textContent = "Invalid input or cell already taken. Try again.";
 	}
 
 	return validMove;
@@ -268,6 +307,7 @@ const startGameButton = document.querySelector("#start-game");
 // variables and objects
 let gameUpdates = "";
 let gameStarted = false;
+let game = gameController();
 // let player1Name = "";
 // let player2Name = "";
 
@@ -288,7 +328,7 @@ startGameButton.addEventListener("click", () => {
 	// checking for truthiness of player name variables
 	if (player1Name && player2Name) {
 		gameStarted = true;
-		const game = gameController(player1Name, player2Name);
+		game.setPlayerNames(player1Name, player2Name);
 	} else {
 		alert("Enter both player names!");
 	}
@@ -296,8 +336,18 @@ startGameButton.addEventListener("click", () => {
 
 // TODO: update gameboard when player clicks a cell to place a mark
 gameboardElement.addEventListener("click", (event) => {
-	console.log(event);
+	if (gameStarted) {
+		if (event.target.classList.contains("cell") == false) {
+			return;
+		}
+		const cell = event.target.id.replace("cell", "");
+		game.playRound(cell);
+	} else {
+		alert("Remember to start the game!");
+	}
 });
+
+// TODO: Probably make updates of game information a function
 
 // TODO: Render board to the UI
 function renderGameboard() {
