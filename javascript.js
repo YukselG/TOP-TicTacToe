@@ -7,14 +7,11 @@ const gameboard = (function () {
 	for (let i = 0; i < rows; i++) {
 		board[i] = [];
 		for (let j = 0; j < columns; j++) {
-			board[i][j] = 0;
+			board[i][j] = "";
 		}
 	}
 
 	let placeMark = function (row, column, mark) {
-		console.log(row);
-		console.log(column);
-
 		board[row][column] = mark;
 	};
 
@@ -120,8 +117,6 @@ function gameController() {
 		let row = Math.floor(cell / 3);
 		// get the col of the cell: cell mod 3
 		let col = cell % 3;
-		console.log("row = " + row);
-		console.log("col = " + col);
 
 		// check for valid cell
 		let validCell = checkPlayerMoveValidity(row, col);
@@ -146,25 +141,27 @@ function gameController() {
 
 		if (turnCounter == 0) {
 			// update player turn information
-			gameUpdatesParagraph.textContent = `${getPlayerTurn().getName()} starts!`;
+			updateGameInformation(`${getPlayerTurn().getName()} starts!`);
+			// gameUpdatesParagraph.textContent = `${getPlayerTurn().getName()} starts!`;
 			console.log(`${getPlayerTurn().getName()} starts!`);
 		} else if (turnCounter < 9) {
-			gameUpdatesParagraph.textContent = `${getPlayerTurn().getName()} it's your turn!`;
+			updateGameInformation(`${getPlayerTurn().getName()} it's your turn!`);
+			// gameUpdatesParagraph.textContent = `${getPlayerTurn().getName()} it's your turn!`;
 			console.log(`${getPlayerTurn().getName()}'s turn!`);
 		}
 
-		//playRound();
-
 		// check for winner after 5 plays
-		if (turnCounter > 4) {
+		if (turnCounter > 3) {
 			const checkWinnerResult = checkWinner(gameboard);
 
 			winnerFound = checkWinnerResult.getWinningConditionMet();
 			if (winnerFound == true) {
 				let winningMark = checkWinnerResult.getWinningMark();
 				if (winningMark == playerX.getMark()) {
+					updateGameInformation(`${playerX.getName()} with the ${winningMark} mark has won!`);
 					console.log(`${playerX.getName()} with the ${winningMark} mark has won!`);
 				} else if (winningMark == playerO.getMark()) {
+					updateGameInformation(`${playerO.getName()} with the ${winningMark} mark has won!`);
 					console.log(`${playerO.getName()} with the ${winningMark} mark has won!`);
 				}
 				return true; // return true -> game is done (winner found)
@@ -173,6 +170,7 @@ function gameController() {
 
 		// check for tie
 		if (turnCounter > 8 && winnerFound == false) {
+			updateGameInformation(`No winners. It's a tie!`);
 			console.log("No winners. It's a tie!");
 			return true; // return true -> game is done (it's a tie)
 		}
@@ -200,16 +198,20 @@ function gameController() {
 			col = playerMove.col;
 		}
 
+		console.log("turncounter = " + turnCounter);
+
 		// place mark after securing valid cell
 		gameboard.placeMark(row, col, getPlayerTurn().getMark());
-		console.table(gameboard.getGameboard());
 
 		// update player turn to next player
 		updatePlayerTurn();
 
-		return;
 		// print board after a player move
-		nextRound();
+		if (winnerFound == false) {
+			nextRound();
+		}
+
+		return;
 	};
 
 	// game loop
@@ -224,11 +226,15 @@ function gameController() {
 	// 	}
 	// }
 
-	return { getPlayerTurn, getTurnCount, playRound, setPlayerNames };
+	return { getPlayerTurn, getTurnCount, playRound, setPlayerNames, nextRound };
 }
 
 const checkPlayerMoveValidity = function (row, column) {
 	let validMove = false;
+	console.log(row);
+	console.log(column);
+	console.log(gameboard.getCellValue(row, column) == "-");
+
 	if (
 		!isNaN(row) &&
 		!isNaN(column) &&
@@ -236,7 +242,7 @@ const checkPlayerMoveValidity = function (row, column) {
 		row < 3 &&
 		column >= 0 &&
 		column < 3 &&
-		gameboard.getCellValue(row, column) == 0
+		gameboard.getCellValue(row, column) === ""
 	) {
 		validMove = true;
 	} else {
@@ -254,7 +260,7 @@ function checkWinner(gameboard) {
 
 	// helper function to pass in 3 values
 	function checkThe3Values(a, b, c) {
-		if (a !== 0 && a == b && b == c) {
+		if (a !== "" && a == b && b == c) {
 			winningConditionMet = true;
 			winnerMark = a;
 			return winningConditionMet;
@@ -329,6 +335,7 @@ startGameButton.addEventListener("click", () => {
 	if (player1Name && player2Name) {
 		gameStarted = true;
 		game.setPlayerNames(player1Name, player2Name);
+		game.nextRound();
 	} else {
 		alert("Enter both player names!");
 	}
@@ -348,6 +355,9 @@ gameboardElement.addEventListener("click", (event) => {
 });
 
 // TODO: Probably make updates of game information a function
+function updateGameInformation(info) {
+	gameUpdatesParagraph.textContent = info;
+}
 
 // TODO: Render board to the UI
 function renderGameboard() {
@@ -357,7 +367,7 @@ function renderGameboard() {
 	const gameboardStateFlatten = gameboardState.flat();
 	let index = 0;
 
-	if (gameStarted == false) {
+	if (gameStarted == true) {
 		gameboardCells.forEach((cell) => {
 			// assign each cell value to each cell ui
 			cell.textContent = gameboardStateFlatten[index];
