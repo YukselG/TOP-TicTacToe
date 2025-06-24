@@ -120,7 +120,6 @@ function gameController() {
 
 		// check for valid cell
 		let validCell = checkPlayerMoveValidity(row, col);
-		console.log("validcell = " + validCell);
 
 		return { row, col, validCell };
 	};
@@ -136,8 +135,6 @@ function gameController() {
 
 		// render board
 		renderGameboard();
-
-		console.log("turnCounter = " + turnCounter);
 
 		if (turnCounter == 0) {
 			// update player turn information
@@ -182,13 +179,7 @@ function gameController() {
 		// let validCell = false;
 		let row;
 		let col;
-		// if (validCell == false) {
-		// 	const playerMove = getPlayerMove(move);
 
-		// 	if (playerMove == true) {
-		// 		validCell = true;
-		// 	}
-		// }
 		let playerMove = getPlayerMove(move);
 		let validCell = playerMove.validCell;
 		if (validCell == false) {
@@ -198,8 +189,6 @@ function gameController() {
 			col = playerMove.col;
 		}
 
-		console.log("turncounter = " + turnCounter);
-
 		// place mark after securing valid cell
 		gameboard.placeMark(row, col, getPlayerTurn().getMark());
 
@@ -207,8 +196,8 @@ function gameController() {
 		updatePlayerTurn();
 
 		// print board after a player move
-		if (winnerFound == false) {
-			nextRound();
+		if (gameOver == false) {
+			gameOver = nextRound();
 		}
 
 		return;
@@ -216,6 +205,29 @@ function gameController() {
 
 	// game loop
 	let gameOver = false;
+
+	const getGameOver = () => gameOver;
+
+	const resetGame = function () {
+		// set variables to initial values
+		turnCounter = 0;
+		winnerFound = false;
+		gameOver = false;
+		playerTurn = playerX;
+
+		// clear gameboard
+		const board = gameboard.getGameboard();
+		for (let i = 0; i < 3; i++) {
+			board[i] = [];
+			for (let j = 0; j < 3; j++) {
+				board[i][j] = "";
+			}
+		}
+
+		// Call nextRound to re-render board and update game info text
+		nextRound();
+	};
+
 	// run while game is not over - for console
 	// while (!gameOver) {
 	// 	gameOver = nextRound();
@@ -226,14 +238,13 @@ function gameController() {
 	// 	}
 	// }
 
-	return { getPlayerTurn, getTurnCount, playRound, setPlayerNames, nextRound };
+	return { getPlayerTurn, getTurnCount, playRound, setPlayerNames, nextRound, getGameOver, resetGame };
 }
 
 const checkPlayerMoveValidity = function (row, column) {
 	let validMove = false;
 	console.log(row);
 	console.log(column);
-	console.log(gameboard.getCellValue(row, column) == "-");
 
 	if (
 		!isNaN(row) &&
@@ -247,7 +258,7 @@ const checkPlayerMoveValidity = function (row, column) {
 		validMove = true;
 	} else {
 		console.log("Invalid input or cell already taken. Try again.");
-		gameUpdatesParagraph.textContent = "Invalid input or cell already taken. Try again.";
+		updateGameInformation(`Invalid input or cell already taken. Try again.`);
 	}
 
 	return validMove;
@@ -309,21 +320,12 @@ const gameboardElement = document.querySelector(".gameboard");
 const gameboardCells = gameboardElement.querySelectorAll(".cell");
 const gameUpdatesParagraph = document.querySelector(".game-updates");
 const startGameButton = document.querySelector("#start-game");
+const resetGameButton = document.querySelector("#reset-game");
 
 // variables and objects
 let gameUpdates = "";
 let gameStarted = false;
 let game = gameController();
-// let player1Name = "";
-// let player2Name = "";
-
-// get names from inputs
-// document.querySelector("#player1").addEventListener("input", (event) => {x
-// 	player1Name = event.target.value;
-// });
-// document.querySelector("#player2").addEventListener("input", (event) => {
-// 	player2Name = event.target.value;
-// });
 
 // start game
 startGameButton.addEventListener("click", () => {
@@ -341,25 +343,29 @@ startGameButton.addEventListener("click", () => {
 	}
 });
 
-// TODO: update gameboard when player clicks a cell to place a mark
 gameboardElement.addEventListener("click", (event) => {
-	if (gameStarted) {
+	if (gameStarted == true && game.getGameOver() == false) {
 		if (event.target.classList.contains("cell") == false) {
 			return;
 		}
 		const cell = event.target.id.replace("cell", "");
 		game.playRound(cell);
+	} else if (gameStarted == true && game.getGameOver() == true) {
+		return;
 	} else {
 		alert("Remember to start the game!");
 	}
 });
 
-// TODO: Probably make updates of game information a function
+// listen for reset game
+resetGameButton.addEventListener("click", () => {
+	game.resetGame();
+});
+
 function updateGameInformation(info) {
 	gameUpdatesParagraph.textContent = info;
 }
 
-// TODO: Render board to the UI
 function renderGameboard() {
 	// get board
 	const gameboardState = gameboard.getGameboard();
@@ -367,11 +373,9 @@ function renderGameboard() {
 	const gameboardStateFlatten = gameboardState.flat();
 	let index = 0;
 
-	if (gameStarted == true) {
-		gameboardCells.forEach((cell) => {
-			// assign each cell value to each cell ui
-			cell.textContent = gameboardStateFlatten[index];
-			index++;
-		});
-	}
+	gameboardCells.forEach((cell) => {
+		// assign each cell value to each cell ui
+		cell.textContent = gameboardStateFlatten[index];
+		index++;
+	});
 }
